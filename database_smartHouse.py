@@ -2,61 +2,137 @@ from database_base import *
 
 
 class CDatabaseSmartHouse(CDatabase):
-    def getSensorLastValue(
+
+    def insertar_clientes(
         self,
-        sensorID: int,
+        clientValues: list,   
     ):
         try:
-            os = (
-                "select origin.ID_SENSOR, origin.INFO_DATE, origin.VALUE from sensor_values origin, "
-                "(select ID_SENSOR, MAX(INFO_DATE) as info_Date from sensor_values where ID_SENSOR = %s group by ID_SENSOR) latest "
-                "where origin.ID_SENSOR = latest.ID_SENSOR and origin.INFO_DATE = latest.INFO_DATE;"
-            )
-
-            param = [sensorID]
-
-            ok, response = self._select_query(os, param)
-
-            return ok, response
-
-        except Exception as e:
-            self._logger.error(e)
-            return False, e
-
-    def insertCustomer(
-        self,
-        name: str,
-    ):
-        try:
-            ## Get last id
-            os_getID = ""
-            os_getID = "SELECT MAX(ID_CUSTOMER) as ID FROM CUSTOMER;"
-            ok, response = self._select_query(os_getID)
-            if ok:
-                lastID = response[1][0]
-                customerID = lastID + 1
-                ## Insert new customer
-                os_insert = "INSERT INTO CUSTOMER (ID_CUSTOMER, NAME) VALUES (%s, %s);"
-                param = [customerID, name]
-                ok, response_insert = self._insert_query(os_insert, param)
-            return ok, customerID
-        except Exception as e:
-            self._logger.error(e)
-            return False, e
-
-    def insertSensorValues(
-        self,
-        sensor_id: int,
-        sensorValues: list,
-    ):
-        ok = True
-        try:
-            for timestamp, value in sensorValues:
-                os = "INSERT INTO SENSOR_VALUES (id_sensor, info_date, value) VALUES (%s,FROM_UNIXTIME(%s),%s);"
-                param = [sensor_id, timestamp, value]
+            ok = True
+            response : []
+            
+            for iban, cif in clientValues:
+                os = "INSERT INTO CLIENTE (iban, cif) VALUES (%s, %s)"
+                param = [iban, cif]
+                
                 ok_partial, response = self._insert_query(os, param)
                 ok = ok_partial and ok
             return ok, response
         except Exception as e:
             self._logger.error(e)
             return False, e
+        
+    def insertar_zona(
+        self,
+        id_zona: int,
+    ):
+        try:
+            ok = True
+            response : []
+            
+            for id_zona_param in id_zona:
+                os = "INSERT INTO ZONA_METEOROLOGICA (id_zona) VALUES (%s)"
+                param = [id_zona_param]
+                
+                ok_partial, response = self._insert_query(os, param)
+                ok = ok_partial and ok
+            return ok, response
+        except Exception as e:
+            self._logger.error(e)
+            return False, e
+    
+    def insertar_casa(
+        self,
+        casaValues: list,
+    ):
+        try:
+            ok = True
+            response : []
+            
+            for id_casa, adress, id_zona in casaValues:
+                os = "INSERT INTO CASA (id_casa, adress, id_zona) VALUES (%s, %s, %s)"
+                param = [id_casa, adress, id_zona]
+                
+                ok_partial, response = self._insert_query(os, param)
+                ok = ok_partial and ok
+            return ok, response
+        except Exception as e:
+            self._logger.error(e)
+            return False, e
+
+
+    def insertar_habitacion(
+        self,
+        habitacionValues: list,
+    ):
+        try:
+            ok = True
+            response : []
+            
+            for id_habitacion, id_casa in habitacionValues:
+                os = "INSERT INTO HABITACION (id_habitacion, id_casa) VALUES (%s, %s)"
+                param = [id_habitacion, id_casa]
+                
+                ok_partial, response = self._insert_query(os, param)
+                ok = ok_partial and ok
+            return ok, response
+        except Exception as e:
+            self._logger.error(e)
+            return False, e
+        
+    def insertar_clientecasa(
+        self,
+        clientecasaValues: list,
+    ):
+        try:
+            ok = True
+            response : []
+            
+            for iban, id_casa in clientecasaValues:
+                os = "INSERT INTO CLIENTE_CASA (iban, id_casa) VALUES (%s, %s)"
+                param = [iban, id_casa]
+                
+                ok_partial, response = self._insert_query(os, param)
+                ok = ok_partial and ok
+            return ok, response
+        except Exception as e:
+            self._logger.error(e)
+            return False, e 
+         
+    def insertar_tiposensor(
+        self,
+        tiposensorValues: list,
+    ):
+        try:
+            ok = True
+            response : []
+            
+            for id_tipo_sensor, description, unidad in tiposensorValues:
+                os = "INSERT INTO TIPO_SENSOR (id_tipo_sensor, description, unidad) VALUES (%s, %s, %s)"
+                param = [id_tipo_sensor, description, unidad]
+                
+                ok_partial, response = self._insert_query(os, param)
+                ok = ok_partial and ok
+            return ok, response
+        except Exception as e:
+            self._logger.error(e)
+            return False, e     
+        
+    def insertar_sensor(
+        self,
+        sensorValues: list,
+    ):
+        try:
+            ok = True
+            response : []
+            
+            for n_serie_sensor, id_habitacion, id_tipo_sensor, id_casa in sensorValues:
+                os = "INSERT INTO SENSOR (n_serie_sensor, id_habitacion, id_tipo_sensor, id_casa) VALUES (%s, %s, %s, %s)"
+                param = [n_serie_sensor, id_habitacion, id_tipo_sensor, id_casa]
+                
+                ok_partial, response = self._insert_query(os, param)
+                ok = ok_partial and ok
+            return ok, response
+        except Exception as e:
+            self._logger.error(e)
+            return False, e  

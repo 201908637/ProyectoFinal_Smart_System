@@ -1,6 +1,6 @@
 import mysql.connector
 import logging
--- jnjkn
+
 
 class CDatabase:
     def __init__(
