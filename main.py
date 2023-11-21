@@ -86,10 +86,6 @@ def main():
                             ("789", "3", "2", "2")]
             ok, response_insert_sensor = _database.insertar_sensor(sensorValues)
 
-            tipoactuadorValues = [("1", "Mide temperatura", "Grados Celsius"),
-                                  ("2", "Mide potencia", "kW"),
-                                  ("3", "Mide humedad", "%")]
-
             _database.commit_transaction()
             
             ## Close connection to DB
