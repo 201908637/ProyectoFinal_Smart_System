@@ -1,8 +1,8 @@
 from database_base import *
 
 
-class CDatabaseSmartHouse(CDatabase):
-
+class CDatabaseExample(CDatabase):
+   
     def insertar_clientes(
         self,
         clientValues: list,   
@@ -135,24 +135,7 @@ class CDatabaseSmartHouse(CDatabase):
             return ok, response
         except Exception as e:
             self._logger.error(e)
-            return False, e 
+            return False, e    
         
-    def insertar_tipoactuador(
-        self,
-        tipoactuadorValues: list,
-    ):
-        try:
-            ok = True
-            response : []
-            
-            for id_tipo_actuador, desc_actuador, unidad in tipoactuadorValues:
-                os = "INSERT INTO TIPO_ACTUADOR (id_tipo_actuador, desc_actuador, unidad) VALUES (%s, %s, %s)"
-                param = [id_tipo_actuador, desc_actuador, unidad]
-                
-                ok_partial, response = self._insert_query(os, param)
-                ok = ok_partial and ok
-            return ok, response
-        except Exception as e:
-            self._logger.error(e)
-            return False, e   
-        
+
+    
