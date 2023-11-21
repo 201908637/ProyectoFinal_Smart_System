@@ -1,0 +1,135 @@
+CREATE DATABASE SmartHouse;
+USE SmartHouse;
+
+CREATE  TABLE cliente ( 
+	iban                 INT    NOT NULL   PRIMARY KEY,
+	cif                  INT       
+ );
+
+CREATE  TABLE tipo_actuador ( 
+	id_tipo_actuador     INT    NOT NULL   PRIMARY KEY,
+	desc_actuador        VARCHAR(20)       ,
+	unidad               VARCHAR(30)       
+ );
+
+CREATE  TABLE tipo_sensor ( 
+	id_tipo_sensor       INT    NOT NULL   PRIMARY KEY,
+	description          VARCHAR(20)       ,
+	unidad               VARCHAR(20)       
+ );
+
+CREATE  TABLE zona_meteorologica ( 
+	id_zona              INT    NOT NULL   PRIMARY KEY
+ );
+
+CREATE  TABLE casa ( 
+	id_casa              INT    NOT NULL   PRIMARY KEY,
+	adress               VARCHAR(20)       ,
+	id_zona              INT    NOT NULL   
+ );
+
+CREATE  TABLE cliente_casa ( 
+	iban                 INT    NOT NULL   ,
+	id_casa              INT    NOT NULL   ,
+	CONSTRAINT pk PRIMARY KEY ( iban, id_casa )
+ );
+
+CREATE  TABLE habitacion ( 
+	id_habitacion        INT    NOT NULL   ,
+	id_casa              INT    NOT NULL   ,
+	CONSTRAINT pk_habitacion PRIMARY KEY ( id_habitacion, id_casa )
+ );
+
+CREATE  TABLE optimizacion ( 
+	id_optimizacion      INT    NOT NULL   PRIMARY KEY,
+	fecha_prevista       DATE       ,
+	id_casa              INT    NOT NULL   
+ );
+
+CREATE  TABLE prediccion ( 
+	fecha_prediccion     DATE       ,
+	id_prediccion        INT    NOT NULL   PRIMARY KEY,
+	id_zona              INT    NOT NULL   
+ );
+
+CREATE  TABLE sensor ( 
+	n_serie_sensor       INT    NOT NULL   PRIMARY KEY,
+	id_habitacion        INT       ,
+	id_tipo_sensor       INT    NOT NULL   ,
+	id_casa              INT       
+ );
+
+CREATE  TABLE tarifa_elec ( 
+	id_tarifa            INT    NOT NULL   PRIMARY KEY,
+	fecha                DATE       ,
+	precio               DECIMAL       ,
+	id_casa              INT    NOT NULL   
+ );
+
+CREATE  TABLE valores_salida ( 
+	fecha                DATE    NOT NULL   ,
+	valor                INT       ,
+	id_prediccion        INT    NOT NULL   ,
+	CONSTRAINT pk_valores_salida PRIMARY KEY ( fecha, id_prediccion )
+ );
+
+CREATE  TABLE actuador ( 
+	id_actuador          INT    NOT NULL   PRIMARY KEY,
+	id_habitacion        INT    ,
+	id_casa		     INT    ,
+	id_tipo_actuador     INT    NOT NULL   
+ );
+
+CREATE  TABLE consigna ( 
+	valor_consigna       INT       ,
+	fecha_consigna       DATE    NOT NULL   ,
+	id_actuador          INT    NOT NULL   ,
+	CONSTRAINT pk_consigna PRIMARY KEY ( fecha_consigna, id_actuador )
+ );
+
+CREATE  TABLE medidas ( 
+	fecha                DATE    NOT NULL   ,
+	valor                INT       ,
+	n_serie_sensor       INT    NOT NULL   ,
+	CONSTRAINT pk_medidas PRIMARY KEY ( fecha, n_serie_sensor )
+ );
+
+CREATE  TABLE valores_optimizacion ( 
+	valor_opt            INT       ,
+	fecha_actuacion      DATE    NOT NULL   ,
+	id_actuador          INT    NOT NULL   ,
+	id_optimizacion      INT    NOT NULL   ,
+	CONSTRAINT pk_valores_optimizacion PRIMARY KEY ( fecha_actuacion, id_actuador, id_optimizacion )
+ );
+
+ALTER TABLE actuador ADD CONSTRAINT fk_actuador_habitacion FOREIGN KEY ( id_habitacion, id_casa ) REFERENCES habitacion( id_habitacion, id_casa ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE actuador ADD CONSTRAINT fk_actuador_tipo_actuador FOREIGN KEY ( id_tipo_actuador ) REFERENCES tipo_actuador( id_tipo_actuador ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE casa ADD CONSTRAINT `fk_casa_zona meteoroliga` FOREIGN KEY ( id_zona ) REFERENCES zona_meteorologica( id_zona ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE cliente_casa ADD CONSTRAINT fk_cliente_casa_cliente FOREIGN KEY ( iban ) REFERENCES cliente( iban ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE cliente_casa ADD CONSTRAINT fk_cliente_casa_casa FOREIGN KEY ( id_casa ) REFERENCES casa( id_casa ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE consigna ADD CONSTRAINT fk_consigna_actuador FOREIGN KEY ( id_actuador ) REFERENCES actuador( id_actuador ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE habitacion ADD CONSTRAINT fk_habitacion_casa FOREIGN KEY ( id_casa ) REFERENCES casa( id_casa ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE medidas ADD CONSTRAINT fk_medidas_sensor FOREIGN KEY ( n_serie_sensor ) REFERENCES sensor( n_serie_sensor ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE optimizacion ADD CONSTRAINT fk_optimizacion_casa FOREIGN KEY ( id_casa ) REFERENCES casa( id_casa ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE prediccion ADD CONSTRAINT `fk_prediccion_zona meteoroliga` FOREIGN KEY ( id_zona ) REFERENCES zona_meteorologica( id_zona ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE sensor ADD CONSTRAINT fk_sensor_habitacion FOREIGN KEY ( id_habitacion, id_casa ) REFERENCES habitacion( id_habitacion, id_casa ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE sensor ADD CONSTRAINT fk_sensor_tipo FOREIGN KEY ( id_tipo_sensor ) REFERENCES tipo_sensor( id_tipo_sensor ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE tarifa_elec ADD CONSTRAINT fk_tarifa_elec_casa FOREIGN KEY ( id_casa ) REFERENCES casa( id_casa ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE valores_optimizacion ADD CONSTRAINT fk_valores_optimizacion_actuador FOREIGN KEY ( id_actuador ) REFERENCES actuador( id_actuador ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE valores_optimizacion ADD CONSTRAINT fk_valores_optimizacion_optimizacion FOREIGN KEY ( id_optimizacion ) REFERENCES optimizacion( id_optimizacion ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE valores_salida ADD CONSTRAINT fk_valores_salida_prediccion FOREIGN KEY ( id_prediccion ) REFERENCES prediccion( id_prediccion ) ON DELETE NO ACTION ON UPDATE NO ACTION;
